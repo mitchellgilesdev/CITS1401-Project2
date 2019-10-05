@@ -34,14 +34,14 @@ def main(textfile1, textfile2, feature):
     return dist, profile1, profile2
 
 
-def conjunctions(lines1):
+def conjunctions(lines):
     conj_list = {
         "also": 0, "although": 0, "and": 0, "as": 0, "because": 0, "before": 0, "but": 0, "for": 0, "if": 0,
         "nor": 0, "of": 0, "or": 0, "since": 0, "that": 0, "though": 0, "until": 0, "when": 0, "whenever": 0,
         "whereas": 0, "which": 0, "while": 0, "yet": 0
     }
 
-    for line in lines1:
+    for line in lines:
         words = line.split()
         for word in words:
             word = word.lower()
@@ -55,8 +55,23 @@ def conjunctions(lines1):
     return conj_list
 
 
-def unigrams():
-    return None
+def unigrams(lines):
+    profile = {}
+
+    for line in lines:
+        words = line.split()
+        for word in words:
+            word = word.lower()
+            new_word = ""
+            for char in word:
+                if char.isalpha():
+                    new_word += char
+            if new_word not in profile:
+                profile.update({new_word: 1})
+            else:
+                profile.update({new_word: profile.get(new_word) + 1})
+
+    return profile
 
 
 def punctuation():
