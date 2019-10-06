@@ -41,6 +41,7 @@ def conjunctions(lines):
     }
 
     for line in lines:
+        line = line.replace("--", " ")
         words = line.split()
         for word in words:
             word = word.lower()
@@ -80,20 +81,20 @@ def punctuation(lines):
         words = line.split()
         for word in words:
             word = word.lower()
-            letter_index = 0
-            for char in word:
+            i = 0
+            for i, character in enumerate(word):
                 # only focus on the characters to be measured, ignore the rest as whitespace
-                if char == '-' and word[letter_index + 1] == '-':
-                    letter_index += 1
+                if character == ',' or character == ';':
+                    profile.update({character: profile.get(character) + 1})
                     continue
-                if char == ',' or char == ';':
-                    profile.update({char: profile.get(char) + 1})
-                    letter_index += 1
+                if i == len(word) - 1:
                     continue
-                if char == "'" or char == '-':
-                    if word[letter_index - 1].isalpha() and word[letter_index + 1].isalpha():
-                        profile.update({char: profile.get(char) + 1})
-                        letter_index += 1
+                if character == '-' and word[i + 1] == '-':
+                    continue
+
+                if character == "'" or character == '-':
+                    if (i - 1) >= 0 and word[i - 1].isalpha() and word[i + 1].isalpha():
+                        profile.update({character: profile.get(character) + 1})
                         continue
     return profile
 
@@ -109,7 +110,7 @@ def composite(lines):
     punctuation_profile = punctuation(lines)
 
     for key in conjunctions_profile:
-        composite_profile.update({key: composite_profile.get(key)})
+        composite_profile.update({key: conjunctions_profile.get(key)})
     for key in punctuation_profile:
         composite_profile.update({key: punctuation_profile.get(key)})
 
@@ -129,12 +130,20 @@ def textAverages(lines):
     current_sentence = ""
     num_paragraphs = 0
     sentences = []
+    skip_next = False
     for i, line in enumerate(lines):
         line_index = 0
         for char in line:
             # check end of current_sentence
+            if skip_next:
+                skip_next = False
+                continue
             if char == '?' or char == '!' or char == '.':
-                if line[line_index + 1].isspace():
+                # make sure the quotation after a full stop is only apart of the first word
+                if char == '.' and line[line_index + 1] == "'":
+                    skip_next = True
+                if line_index == (len(line) - 1) or line[line_index + 1].isspace() or line[line_index + 1] == "'" or \
+                        line[line_index + 1] == '"':
                     current_sentence += char
                     sentences.append(current_sentence)
                     current_sentence = ""
@@ -146,6 +155,7 @@ def textAverages(lines):
             continue
         elif lines[i + 1].isspace():
             num_paragraphs += 1
+        current_sentence += " "
 
     total_words = 0
     for sentence in sentences:
@@ -210,5 +220,4 @@ Composite: number of occurrences of punctuations and conjunctions
             Paragraph -> any number of sentences followed by a blank line or by the end of text.
             
 - 
-
 """
