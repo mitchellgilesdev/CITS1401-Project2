@@ -74,8 +74,7 @@ def unigrams(lines):
 
 
 def punctuation(lines):
-    profile = {}
-    letter_index = 0
+    profile = {',': 0, ';': 0, '-': 0, "'": 0}
 
     for line in lines:
         words = line.split()
@@ -88,29 +87,75 @@ def punctuation(lines):
                     letter_index += 1
                     continue
                 if char == ',' or char == ';':
-                    if char not in profile:
-                        profile.update({char: 1})
-                        letter_index += 1
-                        continue
-                    else:
+                    profile.update({char: profile.get(char) + 1})
+                    letter_index += 1
+                    continue
+                if char == "'" or char == '-':
+                    if word[letter_index - 1].isalpha() and word[letter_index + 1].isalpha():
                         profile.update({char: profile.get(char) + 1})
                         letter_index += 1
                         continue
-                if char == "'" or char == '-':
-                    if word[letter_index - 1].isalpha() and word[letter_index + 1].isalpha():
-                        if char not in profile:
-                            profile.update({char: 1})
-                            letter_index += 1
-                            continue
-                        else:
-                            profile.update({char: profile.get(char) + 1})
-                            letter_index += 1
-                            continue
     return profile
 
 
 def composite(lines):
-    return None
+    composite_profile = {
+        "also": 0, "although": 0, "and": 0, "as": 0, "because": 0, "before": 0, "but": 0, "for": 0, "if": 0,
+        "nor": 0, "of": 0, "or": 0, "since": 0, "that": 0, "though": 0, "until": 0, "when": 0, "whenever": 0,
+        "whereas": 0, "which": 0, "while": 0, "yet": 0, ',': 0, ';': 0, '-': 0, "'": 0,
+        'words_per_sentence': 0, 'sentences_per_par': 0
+    }
+    conjunctions_profile = conjunctions(lines)
+    punctuation_profile = punctuation(lines)
+
+    for key in conjunctions_profile:
+        composite_profile.update({key: composite_profile.get(key)})
+    for key in punctuation_profile:
+        composite_profile.update({key: punctuation_profile.get(key)})
+
+    wps, spp = textAverages(lines)
+    composite_profile.update({"words_per_sentence": wps})
+    composite_profile.update({"sentences_per_par": spp})
+    return composite_profile
+
+
+def textAverages(lines):
+    """
+    Calculate the words_per_sentence and sentence_per_par
+    :param lines: a list of the lines
+    :return:
+    """
+    # calculate the average number of words per line
+    current_sentence = ""
+    num_paragraphs = 0
+    sentences = []
+    for i, line in enumerate(lines):
+        line_index = 0
+        for char in line:
+            # check end of current_sentence
+            if char == '?' or char == '!' or char == '.':
+                if line[line_index + 1].isspace():
+                    current_sentence += char
+                    sentences.append(current_sentence)
+                    current_sentence = ""
+            else:
+                current_sentence += char
+            line_index += 1
+        if i == (len(lines) - 1):
+            num_paragraphs += 1
+            continue
+        elif lines[i + 1].isspace():
+            num_paragraphs += 1
+
+    total_words = 0
+    for sentence in sentences:
+        sentence = sentence.replace("--", " ")
+        sentence = sentence.replace('.', " ")
+        words = sentence.split()
+        total_words += len(words)
+    averageWPS = total_words / len(sentences)
+    averageSPP = len(sentences) / num_paragraphs
+    return averageWPS, averageSPP
 
 
 def distance(dict1, dict2):
