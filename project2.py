@@ -28,7 +28,6 @@ def main(textfile1, textfile2, feature):
     func = features.get(feature)
     profile1 = func(lines1)
     profile2 = func(lines2)
-
     dist = distance(profile1, profile2)
 
     return dist, profile1, profile2
@@ -74,11 +73,43 @@ def unigrams(lines):
     return profile
 
 
-def punctuation():
-    return None
+def punctuation(lines):
+    profile = {}
+    letter_index = 0
+
+    for line in lines:
+        words = line.split()
+        for word in words:
+            word = word.lower()
+            letter_index = 0
+            for char in word:
+                # only focus on the characters to be measured, ignore the rest as whitespace
+                if char == '-' and word[letter_index + 1] == '-':
+                    letter_index += 1
+                    continue
+                if char == ',' or char == ';':
+                    if char not in profile:
+                        profile.update({char: 1})
+                        letter_index += 1
+                        continue
+                    else:
+                        profile.update({char: profile.get(char) + 1})
+                        letter_index += 1
+                        continue
+                if char == "'" or char == '-':
+                    if word[letter_index - 1].isalpha() and word[letter_index + 1].isalpha():
+                        if char not in profile:
+                            profile.update({char: 1})
+                            letter_index += 1
+                            continue
+                        else:
+                            profile.update({char: profile.get(char) + 1})
+                            letter_index += 1
+                            continue
+    return profile
 
 
-def composite():
+def composite(lines):
     return None
 
 
@@ -117,7 +148,7 @@ Unigrams: count the occurrences of each word in the files. e.g. for
         A test should not cause problem
 
         The word count will be: "a":3, "document":2, "this":2, "is":2, "only":1,
-        "should":1, "not""1, "cause":1, "problem":1
+        "should":1, "not":1, "cause":1, "problem":1
 
 Punctuation: 
             - counts certain pieces of punctuation (comma and semicolon).
