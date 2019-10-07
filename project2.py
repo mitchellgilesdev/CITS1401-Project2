@@ -163,10 +163,7 @@ def textAverages(lines):
         sentence = sentence.replace('.', " ")
         sentence = sentence.replace('\n', " ")
         words = sentence.split()
-        print(words)
         total_words += len(words)
-        print("num words: {}".format(len(words)))
-    print("END OF SENTENCES ******")
     averageWPS = total_words / len(sentences)
     averageSPP = len(sentences) / num_paragraphs
     return averageWPS, averageSPP
