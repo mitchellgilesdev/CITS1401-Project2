@@ -140,7 +140,7 @@ def textAverages(lines):
                 continue
             if char == '?' or char == '!' or char == '.':
                 # make sure the quotation after a full stop is only apart of the first word
-                if char == '.' and line[line_index + 1] == "'":
+                if line[line_index + 1] == '"' or line[line_index + 1] =="'":
                     skip_next = True
                 if line_index == (len(line) - 1) or line[line_index + 1].isspace() or line[line_index + 1] == "'" or \
                         line[line_index + 1] == '"':
@@ -161,8 +161,12 @@ def textAverages(lines):
     for sentence in sentences:
         sentence = sentence.replace("--", " ")
         sentence = sentence.replace('.', " ")
+        sentence = sentence.replace('\n', " ")
         words = sentence.split()
+        print(words)
         total_words += len(words)
+        print("num words: {}".format(len(words)))
+    print("END OF SENTENCES ******")
     averageWPS = total_words / len(sentences)
     averageSPP = len(sentences) / num_paragraphs
     return averageWPS, averageSPP
