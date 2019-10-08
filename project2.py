@@ -46,6 +46,9 @@ def main(textfile1, textfile2, feature):
     profile2 = func(lines2)
     dist = distance(profile1, profile2)
 
+    f1.close()
+    f2.close()
+
     return dist, profile1, profile2
 
 
