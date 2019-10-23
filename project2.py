@@ -5,7 +5,6 @@ Student No: 22490361
 """
 
 import math as m
-import os
 
 
 def main(textfile1, textfile2, feature):
