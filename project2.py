@@ -49,7 +49,7 @@ def main(textfile1, textfile2, feature):
     f1.close()
     f2.close()
 
-    return dist, profile1, profile2
+    return round(dist, 4), profile1, profile2
 
 
 def conjunctions(lines):
@@ -154,8 +154,8 @@ def composite(lines):
         composite_profile.update({key: punctuation_profile.get(key)})
 
     wps, spp = text_averages(lines)
-    composite_profile.update({"words_per_sentence": wps})
-    composite_profile.update({"sentences_per_par": spp})
+    composite_profile.update({"words_per_sentence": round(wps, 4)})
+    composite_profile.update({"sentences_per_par": round(spp, 4)})
 
     return composite_profile
 
